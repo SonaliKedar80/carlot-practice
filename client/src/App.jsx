@@ -9,7 +9,7 @@ const PAGE_SIZE = 6;
 
 export default function App() {
   const [makes, setMakes] = useState([]);
-  const [filters, setFilters] = useState({ make: '' });
+  const [filters, setFilters] = useState({ make: '', maxPrice: '', sort: '' });
   const [page, setPage] = useState(1);
   const [result, setResult] = useState({ items: [], total: 0, totalPages: 0 });
   const [loading, setLoading] = useState(true);

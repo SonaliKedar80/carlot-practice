@@ -7,9 +7,11 @@ async function handleResponse(res) {
   return res.json();
 }
 
-export function fetchCars({ make, page = 1, pageSize = 6 } = {}) {
+export function fetchCars({ make, maxPrice, sort, page = 1, pageSize = 6 } = {}) {
   const params = new URLSearchParams();
   if (make) params.set('make', make);
+  if (maxPrice) params.set('maxPrice', String(maxPrice));
+  if (sort) params.set('sort', sort);
   params.set('page', String(page));
   params.set('pageSize', String(pageSize));
 

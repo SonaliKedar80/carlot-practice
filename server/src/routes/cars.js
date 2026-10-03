@@ -5,13 +5,13 @@ import { paginate } from '../utils/paginate.js';
 
 const router = Router();
 
-// GET /api/cars?make=Toyota&page=1&pageSize=6
+// GET /api/cars?make=Toyota&maxPrice=20000&sort=mileage&page=1&pageSize=6
 router.get('/', (req, res) => {
-  const { make } = req.query;
+  const { make, maxPrice, sort } = req.query;
   const page = Number(req.query.page) || 1;
   const pageSize = Number(req.query.pageSize) || 6;
 
-  const filtered = filterCars(cars, { make });
+  const filtered = filterCars(cars, { make, maxPrice, sort });
 
   res.json(paginate(filtered, page, pageSize));
 });
