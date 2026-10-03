@@ -1,6 +1,7 @@
 import express from 'express';
 import carsRouter from './routes/cars.js';
 import enquiriesRouter from './routes/enquiries.js';
+import favouritesRouter from './routes/favourites.js';
 
 export function createApp() {
   const app = express();
@@ -13,6 +14,7 @@ export function createApp() {
 
   app.use('/api/cars', carsRouter);
   app.use('/api/enquiries', enquiriesRouter);
+  app.use('/api/favourites', favouritesRouter);
 
   // Anything under /api that no route handled
   app.use('/api', (req, res) => {

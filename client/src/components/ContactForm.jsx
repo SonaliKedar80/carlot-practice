@@ -1,26 +1,43 @@
 import { useState } from 'react';
 import { sendEnquiry } from '../api.js';
+import { validateEnquiry } from '../utils/validateEnquiry.js';
 
 const EMPTY_FORM = { name: '', email: '', phone: '', message: '' };
 
 export default function ContactForm({ car, onClose }) {
   const [form, setForm] = useState(EMPTY_FORM);
+  const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('idle'); // idle | sending | sent | failed
 
   function update(event) {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
+    setErrors((current) => {
+      if (!current[name]) return current;
+      const next = { ...current };
+      delete next[name];
+      return next;
+    });
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
+    const nextErrors = validateEnquiry(form);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
+
     setStatus('sending');
 
     try {
       await sendEnquiry({ carId: car.id, ...form });
       setStatus('sent');
-    } catch {
-      setStatus('failed');
+    } catch (error) {
+      if (error.errors) {
+        setErrors(error.errors);
+        setStatus('idle');
+      } else {
+        setStatus('failed');
+      }
     }
   }
 
@@ -41,20 +58,55 @@ export default function ContactForm({ car, onClose }) {
             </button>
           </>
         ) : (
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             <label className="field">
               <span>Name</span>
-              <input name="name" value={form.name} onChange={update} />
+              <input
+                name="name"
+                value={form.name}
+                onChange={update}
+                aria-invalid={Boolean(errors.name)}
+                aria-describedby={errors.name ? 'name-error' : undefined}
+              />
+              {errors.name && (
+                <span className="field-error" id="name-error">
+                  {errors.name}
+                </span>
+              )}
             </label>
 
             <label className="field">
               <span>Email</span>
-              <input name="email" value={form.email} onChange={update} />
+              <input
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={update}
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={errors.email ? 'email-error' : undefined}
+              />
+              {errors.email && (
+                <span className="field-error" id="email-error">
+                  {errors.email}
+                </span>
+              )}
             </label>
 
             <label className="field">
               <span>Phone</span>
-              <input name="phone" value={form.phone} onChange={update} />
+              <input
+                name="phone"
+                type="tel"
+                value={form.phone}
+                onChange={update}
+                aria-invalid={Boolean(errors.phone)}
+                aria-describedby={errors.phone ? 'phone-error' : undefined}
+              />
+              {errors.phone && (
+                <span className="field-error" id="phone-error">
+                  {errors.phone}
+                </span>
+              )}
             </label>
 
             <label className="field">
@@ -64,7 +116,14 @@ export default function ContactForm({ car, onClose }) {
                 rows="4"
                 value={form.message}
                 onChange={update}
+                aria-invalid={Boolean(errors.message)}
+                aria-describedby={errors.message ? 'message-error' : undefined}
               />
+              {errors.message && (
+                <span className="field-error" id="message-error">
+                  {errors.message}
+                </span>
+              )}
             </label>
 
             {status === 'failed' && (

@@ -1,6 +1,6 @@
 import { formatPrice, formatMileage } from '../utils/format.js';
 
-export default function CarCard({ car, onContact }) {
+export default function CarCard({ car, onContact, saved, saving, onToggleFavourite }) {
   return (
     <article className="car-card">
       <div className="car-photo" aria-hidden="true">
@@ -30,9 +30,20 @@ export default function CarCard({ car, onContact }) {
 
         <p className="car-location">{car.location}</p>
 
-        <button type="button" className="button" onClick={() => onContact(car)}>
-          Contact seller
-        </button>
+        <div className="car-actions">
+          <button type="button" className="button" onClick={() => onContact(car)}>
+            Contact seller
+          </button>
+          <button
+            type="button"
+            className={saved ? 'button button-saved' : 'button button-light'}
+            aria-pressed={saved}
+            disabled={saving}
+            onClick={() => onToggleFavourite(car)}
+          >
+            {saved ? 'Saved' : 'Save to favourites'}
+          </button>
+        </div>
       </div>
     </article>
   );

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchCars, fetchMakes } from './api.js';
+import { fetchCars, fetchFavourites, fetchMakes, removeFavourite, saveFavourite } from './api.js';
 import Filters from './components/Filters.jsx';
 import CarList from './components/CarList.jsx';
 import Pagination from './components/Pagination.jsx';
@@ -15,6 +15,24 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedCar, setSelectedCar] = useState(null);
+  const [favouriteIds, setFavouriteIds] = useState([]);
+  const [pendingIds, setPendingIds] = useState([]);
+
+  // Favourites stay in app state, so they are still correct after changing page
+  useEffect(() => {
+    let cancelled = false;
+    fetchFavourites()
+      .then((ids) => {
+        if (!cancelled) setFavouriteIds(ids);
+      })
+      .catch(() => {
+        if (!cancelled) setFavouriteIds([]);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Load the list of makes once, for the filter dropdown
   useEffect(() => {
@@ -50,6 +68,22 @@ export default function App() {
     setPage(1); // a new filter always starts from the first page
   }
 
+  async function handleToggleFavourite(car) {
+    if (pendingIds.includes(car.id)) return;
+
+    setPendingIds((ids) => [...ids, car.id]);
+    try {
+      const next = favouriteIds.includes(car.id)
+        ? await removeFavourite(car.id)
+        : await saveFavourite(car.id);
+      setFavouriteIds(next);
+    } catch {
+      // Keep the previous saved state when the request fails.
+    } finally {
+      setPendingIds((ids) => ids.filter((id) => id !== car.id));
+    }
+  }
+
   return (
     <div className="page">
       <header className="header">
@@ -66,7 +100,13 @@ export default function App() {
         {!loading && !error && (
           <>
             <p className="result-count">{result.total} cars found</p>
-            <CarList cars={result.items} onContact={setSelectedCar} />
+            <CarList
+              cars={result.items}
+              onContact={setSelectedCar}
+              favouriteIds={favouriteIds}
+              pendingIds={pendingIds}
+              onToggleFavourite={handleToggleFavourite}
+            />
             <Pagination
               page={page}
               totalPages={result.totalPages}

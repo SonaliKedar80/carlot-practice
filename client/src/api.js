@@ -22,10 +22,34 @@ export function fetchMakes() {
   return fetch('/api/cars/makes').then(handleResponse);
 }
 
-export function sendEnquiry(enquiry) {
-  return fetch('/api/enquiries', {
+export function fetchFavourites() {
+  return fetch('/api/favourites').then(handleResponse);
+}
+
+export function saveFavourite(carId) {
+  return fetch('/api/favourites', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ carId }),
+  }).then(handleResponse);
+}
+
+export function removeFavourite(carId) {
+  return fetch(`/api/favourites/${carId}`, { method: 'DELETE' }).then(handleResponse);
+}
+
+export async function sendEnquiry(enquiry) {
+  const res = await fetch('/api/enquiries', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(enquiry),
-  }).then(handleResponse);
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const error = new Error(`Request failed with status ${res.status}`);
+    error.status = res.status;
+    error.errors = data.errors;
+    throw error;
+  }
+  return data;
 }

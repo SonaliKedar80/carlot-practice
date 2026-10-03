@@ -63,6 +63,12 @@ body {
   font-weight: 600;
 }
 
+.field-error {
+  color: var(--red);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .field input,
 .field select,
 .field textarea {
@@ -180,6 +186,26 @@ body {
 .button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.car-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.car-actions .button {
+  width: 100%;
+}
+
+.button-saved {
+  background: #fff;
+  color: var(--green);
+  border-color: var(--green);
+}
+
+.button-saved:hover:not(:disabled) {
+  background: #eef8f2;
 }
 
 .pagination {
