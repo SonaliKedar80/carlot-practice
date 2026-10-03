@@ -14,6 +14,26 @@ describe('GET /api/cars', () => {
     expect(res.body.page).toBe(1);
   });
 
+  it('includes the partial last page in the page count', async () => {
+    const first = await request(app).get('/api/cars?pageSize=6');
+
+    expect(first.body.total).toBe(22);
+    expect(first.body.totalPages).toBe(4);
+
+    const last = await request(app).get('/api/cars?page=4&pageSize=6');
+    expect(last.status).toBe(200);
+    expect(last.body.items).toHaveLength(4);
+  });
+
+  it('reports one page when a filter returns fewer cars than a page', async () => {
+    const res = await request(app).get('/api/cars?make=Toyota');
+
+    expect(res.status).toBe(200);
+    expect(res.body.total).toBe(4);
+    expect(res.body.totalPages).toBe(1);
+    expect(res.body.items).toHaveLength(4);
+  });
+
   it('filters by make', async () => {
     const res = await request(app).get('/api/cars?make=Toyota');
 

@@ -7,7 +7,7 @@
  */
 export function paginate(items, page = 1, pageSize = 6) {
   const total = items.length;
-  const totalPages = Math.floor(total / pageSize);
+  const totalPages = Math.ceil(total / pageSize);
   const start = (page - 1) * pageSize;
 
   return {
