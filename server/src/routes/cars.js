@@ -1,0 +1,25 @@
+import { Router } from 'express';
+import { cars } from '../data/cars.js';
+import { filterCars } from '../utils/filterCars.js';
+import { paginate } from '../utils/paginate.js';
+
+const router = Router();
+
+// GET /api/cars?make=Toyota&page=1&pageSize=6
+router.get('/', (req, res) => {
+  const { make } = req.query;
+  const page = Number(req.query.page) || 1;
+  const pageSize = Number(req.query.pageSize) || 6;
+
+  const filtered = filterCars(cars, { make });
+
+  res.json(paginate(filtered, page, pageSize));
+});
+
+// GET /api/cars/makes  ->  ["Ford", "Honda", ...]
+router.get('/makes', (req, res) => {
+  const makes = [...new Set(cars.map((car) => car.make))].sort();
+  res.json(makes);
+});
+
+export default router;
