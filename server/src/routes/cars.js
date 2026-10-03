@@ -22,4 +22,16 @@ router.get('/makes', (req, res) => {
   res.json(makes);
 });
 
+// GET /api/cars/3  ->  the car with id 3, or 404
+router.get('/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const car = cars.find((item) => item.id === id);
+
+  if (!car) {
+    return res.status(404).json({ error: 'Car not found' });
+  }
+
+  res.json(car);
+});
+
 export default router;

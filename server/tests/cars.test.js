@@ -45,6 +45,22 @@ describe('GET /api/cars', () => {
   });
 });
 
+describe('GET /api/cars/:id', () => {
+  it('returns the car with that id', async () => {
+    const res = await request(app).get('/api/cars/3');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ id: 3, make: 'Ford', model: 'F-150' });
+  });
+
+  it('returns 404 when the car does not exist', async () => {
+    const res = await request(app).get('/api/cars/999');
+
+    expect(res.status).toBe(404);
+    expect(res.body).toEqual({ error: 'Car not found' });
+  });
+});
+
 describe('GET /api/cars/makes', () => {
   it('returns each make once, in alphabetical order', async () => {
     const res = await request(app).get('/api/cars/makes');
